@@ -6,8 +6,11 @@ const HEIGHT = DIMENSIONS.height - 100;
 // Insets.
 const INSETS = {'left': 200, 'right': 200, 'top': 50, 'bottom': 50};
 
+// Padding.
+const PADDING = {'left': 5, 'right': 5, 'top': 5, 'bottom': 5};
+
 // Data.
-const LAP_COUNT = 10;
+const LAP_COUNT = 9;
 const LAPS = [
     {
         'name': 'Sebastian Vettel',
@@ -51,11 +54,42 @@ function visualize(data) {
         .domain([0, data.length - 1])
         .range([INSETS.top, HEIGHT - INSETS.bottom]);
 
+    scales.clr = d3.scale.category20();
+
     // Root panel.
     var vis = d3.select('#chart')
         .append('svg:svg')
         .attr('width', WIDTH)
         .attr('height', HEIGHT);
+
+
+    // Lap tick-lines.
+    vis.selectAll("line")
+        .data(scales.x.ticks(LAP_COUNT))
+        .enter().append("svg:line")
+        .attr("class", "tickLine")
+        .attr("x1", function(d) {
+            return scales.x(d);
+        })
+        .attr("x2", function(d) {
+            return scales.x(d);
+        })
+        .attr("y1", scales.y.range()[0])
+        .attr("y2", scales.y.range()[1]);
+
+    // Lap labels.
+    vis.selectAll("text.lap")
+        .data(scales.x.ticks(LAP_COUNT))
+        .enter().append("svg:text")
+        .attr("class", "lap")
+        .attr("x", function(d) {
+            return scales.x(d);
+        })
+        .attr("y", scales.y.range()[0] - PADDING.bottom)
+        .attr("text-anchor", "middle")
+        .text(function(d, i) {
+            return i;
+        });
 
     // Add lap poly-lines.
     vis.selectAll('polyline')
@@ -73,6 +107,9 @@ function visualize(data) {
             }
 
             return points.join(' ');
+        })
+        .style('stroke', function(d, i) {
+            return scales.clr(i);
         });
 
     // Add name labels.
@@ -81,7 +118,7 @@ function visualize(data) {
         .enter()
         .append("svg:text")
         .attr("class", "name")
-        .attr("x", INSETS.left)
+        .attr("x", INSETS.left - PADDING.right)
         .attr("y", function (d, i) {
 
             return scales.y(i);
@@ -91,6 +128,9 @@ function visualize(data) {
         .text(function(d) {
 
             return d.name;
+        })
+        .style('fill', function(d, i) {
+            return scales.clr(i);
         });
 }
 
