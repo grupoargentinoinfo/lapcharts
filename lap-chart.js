@@ -10,27 +10,103 @@ const INSETS = {'left': 200, 'right': 200, 'top': 50, 'bottom': 50};
 const PADDING = {'left': 5, 'right': 5, 'top': 5, 'bottom': 5};
 
 // Data.
-const LAP_COUNT = 9;
+const LAP_COUNT = 58;
 const LAPS = [
     {
         'name': 'Sebastian Vettel',
-        'placing': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        'placing': [1,1,1,1,1,1,1,1,1,3,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     },
     {
-        'name': 'Fellipe Massa',
-        'placing': [2, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+        'name': 'Mark Webber',
+        'placing': [2,3,3,3,3,3,2,2,2,1,1,6,6,6,6,6,8,8,8,8,8,8,7,7,7,7,6,6,5,5,5,5,7,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,8,9,9]
     },
     {
         'name': 'Fernando Alonso',
-        'placing': [3, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        'placing': [3,18,18,18,18,15,13,13,15,13,10,10,10,9,8,8,7,7,7,7,7,7,8,8,8,8,7,7,7,7,7,7,6,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
     },
     {
-        'name': 'Lewis Hamilton',
-        'placing': [4, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+        'name': 'Jenson Button',
+        'placing': [4, 6, 6, 6, 6, 6, 19, 19, 12, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    },
+    {
+        'name': 'Felipe Massa',
+        'placing': [5]
     },
     {
         'name': 'Nico Rosberg',
-        'placing': [5, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+        'placing': [6]
+    },
+    {
+        'name': 'Michael Schumacher',
+        'placing': [7]
+    },
+    {
+        'name': 'Rubens Barrichello',
+        'placing': [8]
+    },
+    {
+        'name': 'Robert Kubica',
+        'placing': [9]
+    },
+    {
+        'name': 'Adrian Sutil',
+        'placing': [10]
+    },
+    {
+        'name': 'Lewis Hamilton',
+        'placing': [11]
+    },
+    {
+        'name': 'Sébastien Buemi',
+        'placing': [12]
+    },
+    {
+        'name': 'Vitantonio Liuzzi',
+        'placing': [13]
+    },
+    {
+        'name': 'Pedro De La Rosa',
+        'placing': [14]
+    },
+    {
+        'name': 'Nico Hulkenberg',
+        'placing': [15]
+    },
+    {
+        'name': 'Kamui Kobayashi',
+        'placing': [16]
+    },
+    {
+        'name': 'Jaime Alguersuari',
+        'placing': [17]
+    },
+    {
+        'name': 'Vitaly Petrov',
+        'placing': [18]
+    },
+    {
+        'name': 'Heikki Kovalainen',
+        'placing': [19]
+    },
+    {
+        'name': 'Jarno Trulli',
+        'placing': [20]
+    },
+    {
+        'name': 'Bruno Senna',
+        'placing': [21]
+    },
+    {
+        'name': 'Karun Chandock',
+        'placing': [22]
+    },
+    {
+        'name': 'Timo Glock',
+        'placing': [23]
+    },
+    {
+        'name': 'Luca di Grassi',
+        'placing': [24]
     }
 ];
 
