@@ -4,10 +4,13 @@ const WIDTH = DIMENSIONS.width;
 const HEIGHT = DIMENSIONS.height - 100;
 
 // Insets.
-const INSETS = {'left': 200, 'right': 200, 'top': 50, 'bottom': 50};
+const INSETS = {'left': 150, 'right': 30, 'top': 30, 'bottom': 50};
 
 // Padding.
 const PADDING = {'left': 5, 'right': 5, 'top': 5, 'bottom': 5};
+
+// Tick-mark length.
+const TICK_MARK_LENGTH = 5;
 
 // Data.
 const LAP_COUNT = 58;
@@ -30,11 +33,11 @@ const LAPS = [
     },
     {
         'name': 'Felipe Massa',
-        'placing': [5]
+        'placing': [5, 2, 2, 2, 2, 2, 3, 3, 9, 7, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 5, 5, 6, 6, 6, 6, 5, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
     },
     {
         'name': 'Nico Rosberg',
-        'placing': [6]
+        'placing': [6, 5, 5, 5, 5, 5, 5, 5, 7, 6, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 5, 5, 5]
     },
     {
         'name': 'Michael Schumacher',
@@ -140,31 +143,34 @@ function visualize(data) {
 
 
     // Lap tick-lines.
-    vis.selectAll("line")
+    vis.selectAll('line')
         .data(scales.x.ticks(LAP_COUNT))
-        .enter().append("svg:line")
-        .attr("class", "tickLine")
-        .attr("x1", function(d) {
+        .enter().append('svg:line')
+        .attr('class', 'tickLine')
+        .attr('x1', function(d) {
             return scales.x(d);
         })
-        .attr("x2", function(d) {
+        .attr('x2', function(d) {
             return scales.x(d);
         })
-        .attr("y1", scales.y.range()[0])
-        .attr("y2", scales.y.range()[1]);
+        .attr('y1', scales.y.range()[0] - TICK_MARK_LENGTH)
+        .attr('y2', scales.y.range()[1] + TICK_MARK_LENGTH)
+        .attr('visibility', function(d) {
+            return d > 0 ? 'visible' : 'hidden'
+        });
 
     // Lap labels.
-    vis.selectAll("text.lap")
+    vis.selectAll('text.lap')
         .data(scales.x.ticks(LAP_COUNT))
-        .enter().append("svg:text")
-        .attr("class", "lap")
-        .attr("x", function(d) {
+        .enter().append('svg:text')
+        .attr('class', 'lap')
+        .attr('x', function(d) {
             return scales.x(d);
         })
-        .attr("y", scales.y.range()[0] - PADDING.bottom)
-        .attr("text-anchor", "middle")
+        .attr('y', scales.y.range()[0] - PADDING.bottom)
+        .attr('text-anchor', 'middle')
         .text(function(d, i) {
-            return i;
+            return i > 0 ? i : '';
         });
 
     // Add lap poly-lines.
@@ -189,18 +195,25 @@ function visualize(data) {
         });
 
     // Add name labels.
-    vis.selectAll("text.name")
+    addNameLabels(vis, data, scales, INSETS.left - PADDING.right);
+//    addNameLabels(vis, data, scales, WIDTH - INSETS.right + PADDING.left);
+}
+
+// Add name labels.
+function addNameLabels(vis, data, scales, x) {
+
+    vis.selectAll('text.name')
         .data(data)
         .enter()
-        .append("svg:text")
-        .attr("class", "name")
-        .attr("x", INSETS.left - PADDING.right)
-        .attr("y", function (d, i) {
+        .append('svg:text')
+        .attr('class', 'name')
+        .attr('x', x)
+        .attr('y', function (d, i) {
 
             return scales.y(i);
         })
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "end")
+        .attr('dy', '0.35em')
+        .attr('text-anchor', 'end')
         .text(function(d) {
 
             return d.name;

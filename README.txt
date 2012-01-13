@@ -12,3 +12,6 @@ Highlight on mouse over.
 
 Decorations: pit stops, mechanical failures, collisions, safety car, lapped drivers etc
 
+Put lap count into JSON.
+
+Check integrity of data (unique lap positions)
