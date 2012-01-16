@@ -12,6 +12,13 @@ const PADDING = {'left': 5, 'right': 5, 'top': 5, 'bottom': 5};
 // Tick-mark length.
 const TICK_MARK_LENGTH = 5;
 
+// Scales.
+const SCALES = {};
+
+// Opacity of dimmed objects.
+var DIMMED_OPACITY = 0.2;
+var HIGHLIGHT_OPACITY = 1.0;
+
 // Data.
 const LAP_COUNT = 58;
 const LAPS = [
@@ -45,7 +52,7 @@ const LAPS = [
     },
     {
         'name': 'Rubens Barrichello',
-        'placing': [8]
+        'placing': [8, 9, 9, 9, 9, 9, 8, 7, 10, 8, 7, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8, 8, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 8, 8]
     },
     {
         'name': 'Robert Kubica',
@@ -122,18 +129,15 @@ window.onload = function() {
 // Create the visualization.
 function visualize(data) {
 
-    // Create scales.
-    var scales = {};
-
-    scales.x = d3.scale.linear()
+    SCALES.x = d3.scale.linear()
         .domain([0, LAP_COUNT])
         .range([INSETS.left, WIDTH - INSETS.right]);
 
-    scales.y = d3.scale.linear()
+    SCALES.y = d3.scale.linear()
         .domain([0, data.length - 1])
         .range([INSETS.top, HEIGHT - INSETS.bottom]);
 
-    scales.clr = d3.scale.category20();
+    SCALES.clr = d3.scale.category20();
 
     // Root panel.
     var vis = d3.select('#chart')
@@ -141,33 +145,32 @@ function visualize(data) {
         .attr('width', WIDTH)
         .attr('height', HEIGHT);
 
-
     // Lap tick-lines.
     vis.selectAll('line')
-        .data(scales.x.ticks(LAP_COUNT))
+        .data(SCALES.x.ticks(LAP_COUNT))
         .enter().append('svg:line')
         .attr('class', 'tickLine')
         .attr('x1', function(d) {
-            return scales.x(d);
+            return SCALES.x(d);
         })
         .attr('x2', function(d) {
-            return scales.x(d);
+            return SCALES.x(d);
         })
-        .attr('y1', scales.y.range()[0] - TICK_MARK_LENGTH)
-        .attr('y2', scales.y.range()[1] + TICK_MARK_LENGTH)
+        .attr('y1', SCALES.y.range()[0] - TICK_MARK_LENGTH)
+        .attr('y2', SCALES.y.range()[1] + TICK_MARK_LENGTH)
         .attr('visibility', function(d) {
             return d > 0 ? 'visible' : 'hidden'
         });
 
     // Lap labels.
     vis.selectAll('text.lap')
-        .data(scales.x.ticks(LAP_COUNT))
+        .data(SCALES.x.ticks(LAP_COUNT))
         .enter().append('svg:text')
         .attr('class', 'lap')
         .attr('x', function(d) {
-            return scales.x(d);
+            return SCALES.x(d);
         })
-        .attr('y', scales.y.range()[0] - PADDING.bottom)
+        .attr('y', SCALES.y.range()[0] - PADDING.bottom)
         .attr('text-anchor', 'middle')
         .text(function(d, i) {
             return i > 0 ? i : '';
@@ -185,32 +188,33 @@ function visualize(data) {
                  i < d.placing.length;
                  i++) {
 
-                points[i] = scales.x(i) + ',' + scales.y(d.placing[i] - 1);
+                points[i] = SCALES.x(i) + ',' + SCALES.y(d.placing[i] - 1);
             }
 
             return points.join(' ');
         })
         .style('stroke', function(d, i) {
-            return scales.clr(i);
+            return SCALES.clr(i);
+        })
+        .on('mouseover', function(d, i) {
+
+            highlight(vis, i);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
         });
 
     // Add name labels.
-    addNameLabels(vis, data, scales, INSETS.left - PADDING.right);
-//    addNameLabels(vis, data, scales, WIDTH - INSETS.right + PADDING.left);
-}
-
-// Add name labels.
-function addNameLabels(vis, data, scales, x) {
-
     vis.selectAll('text.name')
         .data(data)
         .enter()
         .append('svg:text')
         .attr('class', 'name')
-        .attr('x', x)
+        .attr('x', INSETS.left - PADDING.right)
         .attr('y', function (d, i) {
 
-            return scales.y(i);
+            return SCALES.y(i);
         })
         .attr('dy', '0.35em')
         .attr('text-anchor', 'end')
@@ -219,8 +223,43 @@ function addNameLabels(vis, data, scales, x) {
             return d.name;
         })
         .style('fill', function(d, i) {
-            return scales.clr(i);
+
+            return SCALES.clr(i);
+        })
+        .on('mouseover', function(d, i) {
+
+            highlight(vis, i);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
         });
+
+}
+
+function highlight(vis, index) {
+
+    // Dim others.
+    vis.selectAll('polyline')
+        .style('opacity', function(d, i) {
+
+            return i == index ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
+        });
+
+    vis.selectAll('text.name')
+        .style('opacity', function(d, i) {
+
+            return i == index ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
+        });
+}
+
+function unhighlight(vis) {
+
+    // Reset colour.
+    vis.selectAll('polyline')
+        .style('opacity', HIGHLIGHT_OPACITY);
+    vis.selectAll('text.name')
+        .style('opacity', HIGHLIGHT_OPACITY);
 }
 
 // Gets the window dimensions.

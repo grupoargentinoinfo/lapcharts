@@ -2,13 +2,9 @@ TODO
 
 Put JSON data in a separate file.
 
-Tick-marks at lap 0.
-
-Place lap labels between tick lines.
-
 Driver names at both ends.
 
-Highlight on mouse over.
+Highlight on mouse-over driver name
 
 Decorations: pit stops, mechanical failures, collisions, safety car, lapped drivers etc
 
