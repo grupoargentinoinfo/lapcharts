@@ -10,13 +10,13 @@ body {
 
 text {
     font-family: sans-serif;
-    font-size: 9px;
+    font-size: 10px;
     fill: #999999;
 }
 
 polyline {
     fill: none;
-    stroke-width: 3;
+    stroke-width: 4;
 }
 
 line.tickLine {
