@@ -123,11 +123,11 @@ function visualize(data) {
         });
 
     // Add name labels.
-    vis.selectAll('text.name')
+    vis.selectAll('text.name.start')
         .data(data.laps)
         .enter()
         .append('svg:text')
-        .attr('class', 'name')
+        .attr('class', 'name start')
         .attr('x', INSETS.left - PADDING.right)
         .attr('y', function (d) {
 
@@ -152,11 +152,11 @@ function visualize(data) {
             unhighlight(vis);
         });
 
-    vis.selectAll('text.name2')
+    vis.selectAll('text.name.finish')
         .data(data.laps)
         .enter()
         .append('svg:text')
-        .attr('class', 'name2')
+        .attr('class', 'name finish')
         .attr('x', WIDTH - INSETS.right + PADDING.left)
         .attr('y', function (d, i) {
 
