@@ -21,8 +21,10 @@ var HIGHLIGHT_OPACITY = 1.0;
 
 
 // Visualize when document has loaded.
+//
 window.onload = function() {
 
+    // Load data.
     d3.json("2010au.json", function(json) {
 
         // Sort on finishing order.
@@ -33,11 +35,15 @@ window.onload = function() {
             return aLaps == bLaps ? a.placing[aLaps - 1] - b.placing[bLaps - 1] : bLaps - aLaps;
         });
 
+        // Visualize the data.
         visualize(json);
     });
 };
 
 // Create the visualization.
+//
+// data the lap data object.
+//
 function visualize(data) {
 
     SCALES.x = d3.scale.linear()
@@ -204,6 +210,8 @@ function highlight(vis, name) {
 }
 
 // Remove highlights.
+//
+// vis: the data visualization root.
 //
 function unhighlight(vis) {
 
