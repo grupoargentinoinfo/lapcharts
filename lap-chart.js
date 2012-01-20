@@ -73,7 +73,7 @@ function visualize(data) {
         .attr('y2', SCALES.y.range()[1] + TICK_MARK_LENGTH)
         .attr('visibility', function(d) {
 
-            return d > 0 ? 'visible' : 'hidden'
+            return d > 0 && d < data.lapCount ? 'visible' : 'hidden'
         });
 
     // Lap labels.
@@ -83,7 +83,7 @@ function visualize(data) {
         .attr('class', 'lap')
         .attr('x', function(d) {
 
-            return SCALES.x(d);
+            return SCALES.x(d - 0.5);
         })
         .attr('y', SCALES.y.range()[0] - PADDING.bottom)
         .attr('text-anchor', 'middle')
@@ -113,9 +113,9 @@ function visualize(data) {
 
             return SCALES.clr(d.placing[0]);
         })
-        .on('mouseover', function(d, i) {
+        .on('mouseover', function(d) {
 
-            highlight(vis, i);
+            highlight(vis, d.name);
         })
         .on('mouseout', function() {
 
@@ -143,9 +143,9 @@ function visualize(data) {
 
             return SCALES.clr(d.placing[0]);
         })
-        .on('mouseover', function(d, i) {
+        .on('mouseover', function(d) {
 
-            highlight(vis, i);
+            highlight(vis, d.name);
         })
         .on('mouseout', function() {
 
@@ -172,6 +172,14 @@ function visualize(data) {
 
             return SCALES.clr(d.placing[0]);
         })
+        .on('mouseover', function(d) {
+
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
+        });
 }
 
 // Highlight driver.
@@ -179,19 +187,19 @@ function visualize(data) {
 // vis: the data visualization root.
 // index: index of driver to highlight.
 //
-function highlight(vis, index) {
+function highlight(vis, name) {
 
     // Dim others.
     vis.selectAll('polyline')
-        .style('opacity', function(d, i) {
+        .style('opacity', function(d) {
 
-            return i == index ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
+            return d.name == name ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
         });
 
     vis.selectAll('text.name')
-        .style('opacity', function(d, i) {
+        .style('opacity', function(d) {
 
-            return i == index ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
+            return d.name == name ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
         });
 }
 
