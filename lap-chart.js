@@ -27,6 +27,9 @@ window.onload = function() {
     // Load data.
     d3.json("2010au.json", function(json) {
 
+        // Check integrity.
+        integrityCheck(json);
+
         // Sort on finishing order.
         json.laps.sort(function(a, b) {
 
@@ -39,6 +42,43 @@ window.onload = function() {
         visualize(json);
     });
 };
+
+function integrityCheck(data) {
+
+    for (var i = 0;
+         i < data.lapCount;
+         i++) {
+
+        var positions = [];
+        var laps = data.laps;
+        for (var j = 0;
+             j < laps.length;
+             j++) {
+
+            var places = laps[j].placing;
+            if (places.length > i) {
+
+                var placing = places[i];
+                var count = positions[placing];
+                positions[placing] = isNaN(count) ? 1 : count + 1
+            }
+        }
+
+        // Check for duplicate/missing positions.
+        for (j = 1;
+            j < positions.length;
+            j++) {
+
+             count = positions[j];
+            if (count != 1) {
+
+                alert ("Warning: data inconsistent: lap " + i + ", position " + j + ", count " + count);
+            }
+        }
+    }
+
+    // todo Check no one has more placings than lapCount.
+}
 
 // Create the visualization.
 //
