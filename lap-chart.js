@@ -7,10 +7,10 @@ const HEIGHT = DIMENSIONS.height - 100;
 const INSETS = {'left': 150, 'right': 150, 'top': 30, 'bottom': 50};
 
 // Padding.
-const PADDING = {'left': 5, 'right': 5, 'top': 5, 'bottom': 5};
+const PADDING = {'left': 8, 'right': 8, 'top': 8, 'bottom': 8};
 
 // Tick-mark length.
-const TICK_MARK_LENGTH = 5;
+const TICK_MARK_LENGTH = 8;
 
 // Scales.
 const SCALES = {};
@@ -43,41 +43,76 @@ window.onload = function() {
     });
 };
 
+// Check data
+//
 function integrityCheck(data) {
 
+    var laps = data.laps;
+    var lapCount = data.lapCount;
+
+    for (var j = 0;
+         j < laps.length;
+         j++) {
+
+        // Has name?
+        var name = laps[j].name;
+        if (name == undefined || name.length == 0) {
+
+            alert("Warning: invalid name for element " + j);
+        }
+
+        // Has placings?
+        var places = laps[j].placing;
+        if (places == undefined) {
+
+            alert("Warning: missing placings for element " + j);
+        }
+        else if (places.size == 0 || places.size > lapCount) {
+
+            alert("Warning: invalid number of placings (" + places.size + ") for element " + j +
+                " - expected between 1 and " + (lapCount - 1));
+        }
+    }
+
+    // Check for consistent placings.
     for (var i = 0;
-         i < data.lapCount;
+         i < lapCount;
          i++) {
 
         var positions = [];
-        var laps = data.laps;
-        for (var j = 0;
+        for (j = 0;
              j < laps.length;
              j++) {
 
-            var places = laps[j].placing;
+            places = laps[j].placing;
             if (places.length > i) {
 
+                // Valid placing?
                 var placing = places[i];
-                var count = positions[placing];
-                positions[placing] = isNaN(count) ? 1 : count + 1
+                if (isNaN(placing) || placing < 1 || placing % 1 != 0) {
+
+                    alert("Warning: invalid placing '" + placing + "' for " + laps[j].name)
+                }
+                else {
+
+                    var count = positions[placing];
+                    positions[placing] = isNaN(count) ? 1 : count + 1
+                }
             }
         }
 
         // Check for duplicate/missing positions.
         for (j = 1;
-            j < positions.length;
-            j++) {
+             j < positions.length;
+             j++) {
 
-             count = positions[j];
+            count = positions[j];
             if (count != 1) {
 
-                alert ("Warning: data inconsistent: lap " + i + ", position " + j + ", count " + count);
+                alert("Warning: data inconsistent: lap " + i + ", position " + j + ", count " + count);
             }
         }
     }
-
-    // todo Check no one has more placings than lapCount.
 }
 
 // Create the visualization.
