@@ -65,17 +65,38 @@ function integrityCheck(data) {
         var places = laps[j].placing;
         if (places == undefined) {
 
-            alert("Warning: missing placings for element " + j);
+            alert("Warning: missing placings for element " + j + " (" + name + ")");
         }
-        else if (places.size == 0 || places.size > lapCount) {
+        else if (places.length == 0 || places.length > lapCount + 1) {
 
-            alert("Warning: invalid number of placings (" + places.size + ") for element " + j +
-                " - expected between 1 and " + (lapCount - 1));
+            alert("Warning: invalid number of placings (" + places.length + ") for element " + j +
+                " (" + name + ") - expected between 1 and " + (lapCount - 1));
+        }
+
+        // Has pitstops?
+        var pitstops = laps[j].pitstops;
+        if (pitstops == undefined) {
+
+            alert("Warning: missing pitstops for element " + j + " (" + name + ")");
+        }
+        else {
+
+            // Check pitstops.
+            for (var i = 0;
+                 i < pitstops.length;
+                 i++) {
+
+                var stop = pitstops[i];
+                if (isNaN(stop) || stop < 0 || stop >= places.length || stop % 1 != 0) {
+
+                    alert("Warning: invalid pitstop (" + stop + ") for element " + j + " (" + name + ")");
+                }
+            }
         }
     }
 
     // Check for consistent placings.
-    for (var i = 0;
+    for (i = 0;
          i < lapCount;
          i++) {
 
