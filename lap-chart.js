@@ -25,21 +25,46 @@ var HIGHLIGHT_OPACITY = 1.0;
 window.onload = function() {
 
     // Load data.
-    d3.json("2010au.json", function(json) {
+    d3.json("2010au.json", function(data) {
 
         // Check integrity.
-        integrityCheck(json);
+        integrityCheck(data);
 
         // Sort on finishing order.
-        json.laps.sort(function(a, b) {
+        data.laps.sort(function(a, b) {
 
             var aLaps = a.placing.length;
             var bLaps = b.placing.length;
             return aLaps == bLaps ? a.placing[aLaps - 1] - b.placing[bLaps - 1] : bLaps - aLaps;
         });
 
+        // Process pitstops.
+        var pitstops = [];
+        var p = 0;
+        for (var i = 0;
+             i < data.laps.length;
+             i++) {
+
+            var lapData = data.laps[i];
+            var laps = lapData.pitstops;
+            for (var j = 0;
+                 j < laps.length;
+                 j++) {
+
+                var lap = laps[j];
+                var pitstop = {};
+                pitstop.start = lapData.placing[0];
+                pitstop.lap = lap;
+                pitstop.placing = lapData.placing[lap];
+
+                pitstops[p++] = pitstop;
+            }
+        }
+
+        data.pitstops = pitstops;
+
         // Visualize the data.
-        visualize(json);
+        visualize(data);
     });
 };
 
@@ -281,6 +306,27 @@ function visualize(data) {
         .on('mouseout', function() {
 
             unhighlight(vis);
+        });
+
+    vis.selectAll("text.marker.pitstop")
+        .data(data.pitstops)
+        .enter()
+        .append("svg:text")
+        .attr("class", "marker pitstop")
+        .attr("x", function(d) {
+
+            return SCALES.x(d.lap);
+        })
+        .attr("y", function(d) {
+
+            return SCALES.y(d.placing - 1);
+        })
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .text("P")
+        .style("fill", function(d) {
+
+            return SCALES.clr(d.start);
         });
 }
 
