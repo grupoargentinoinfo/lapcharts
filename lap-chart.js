@@ -56,6 +56,7 @@ window.onload = function() {
                 pitstop.start = lapData.placing[0];
                 pitstop.lap = lap;
                 pitstop.placing = lapData.placing[lap];
+                pitstop.name = lapData.name;
 
                 pitstops[p++] = pitstop;
             }
@@ -308,6 +309,33 @@ function visualize(data) {
             unhighlight(vis);
         });
 
+    vis.selectAll("circle.marker.pitstop")
+        .data(data.pitstops)
+        .enter()
+        .append("svg:circle")
+        .attr("class", "marker pitstop")
+        .attr("cx", function(d) {
+
+            return SCALES.x(d.lap);
+        })
+        .attr("cy", function(d) {
+
+            return SCALES.y(d.placing - 1);
+        })
+        .attr("r", "10")
+        .style("fill", function(d) {
+
+            return SCALES.clr(d.start);
+        })
+        .on('mouseover', function(d) {
+
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
+        });
+
     vis.selectAll("text.marker.pitstop")
         .data(data.pitstops)
         .enter()
@@ -324,9 +352,13 @@ function visualize(data) {
         .attr("dy", "0.35em")
         .attr("text-anchor", "middle")
         .text("P")
-        .style("fill", function(d) {
+        .on('mouseover', function(d) {
 
-            return SCALES.clr(d.start);
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
         });
 }
 
@@ -339,6 +371,12 @@ function highlight(vis, name) {
 
     // Dim others.
     vis.selectAll('polyline')
+        .style('opacity', function(d) {
+
+            return d.name == name ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
+        });
+
+    vis.selectAll('circle')
         .style('opacity', function(d) {
 
             return d.name == name ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
@@ -357,8 +395,10 @@ function highlight(vis, name) {
 //
 function unhighlight(vis) {
 
-    // Reset colour.
+    // Reset opacity.
     vis.selectAll('polyline')
+        .style('opacity', HIGHLIGHT_OPACITY);
+    vis.selectAll('circle')
         .style('opacity', HIGHLIGHT_OPACITY);
     vis.selectAll('text.name')
         .style('opacity', HIGHLIGHT_OPACITY);

@@ -13,6 +13,10 @@ text {
     fill: #999999;
 }
 
+text.marker {
+    fill: #000000;
+}
+
 polyline {
     fill: none;
     stroke-width: 5;
