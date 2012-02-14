@@ -12,6 +12,9 @@ const PADDING = {'left': 8, 'right': 8, 'top': 8, 'bottom': 8};
 // Tick-mark length.
 const TICK_MARK_LENGTH = 8;
 
+// Marker radius.
+const MARKER_RADIUS = 10;
+
 // Scales.
 const SCALES = {};
 
@@ -38,36 +41,48 @@ window.onload = function() {
             return aLaps == bLaps ? a.placing[aLaps - 1] - b.placing[bLaps - 1] : bLaps - aLaps;
         });
 
-        // Process pitstops.
-        var pitstops = [];
-        var p = 0;
-        for (var i = 0;
-             i < data.laps.length;
-             i++) {
-
-            var lapData = data.laps[i];
-            var laps = lapData.pitstops;
-            for (var j = 0;
-                 j < laps.length;
-                 j++) {
-
-                var lap = laps[j];
-                var pitstop = {};
-                pitstop.start = lapData.placing[0];
-                pitstop.lap = lap;
-                pitstop.placing = lapData.placing[lap];
-                pitstop.name = lapData.name;
-
-                pitstops[p++] = pitstop;
-            }
-        }
-
-        data.pitstops = pitstops;
+        // Process lap markers..
+        data.pitstops = processLapMarkers(data, "pitstops");
+        data.mechanical = processLapMarkers(data, "mechanical");
 
         // Visualize the data.
         visualize(data);
     });
 };
+
+// Process lap markers.
+//
+// data: lap data.
+// key: marker key.
+//
+function processLapMarkers(data, key) {
+
+    var markers = [];
+    var p = 0;
+    for (var i = 0;
+         i < data.laps.length;
+         i++) {
+
+        var lapData = data.laps[i];
+        var laps = lapData[key];
+        if (laps != undefined) {
+            for (var j = 0;
+                 j < laps.length;
+                 j++) {
+
+                var lap = laps[j];
+                var marker = {};
+                marker.start = lapData.placing[0];
+                marker.lap = lap;
+                marker.placing = lapData.placing[lap];
+                marker.name = lapData.name;
+
+                markers[p++] = marker;
+            }
+        }
+    }
+    return markers;
+}
 
 // Check data
 //
@@ -99,26 +114,9 @@ function integrityCheck(data) {
                 " (" + name + ") - expected between 1 and " + (lapCount - 1));
         }
 
-        // Has pitstops?
-        var pitstops = laps[j].pitstops;
-        if (pitstops == undefined) {
-
-            alert("Warning: missing pitstops for element " + j + " (" + name + ")");
-        }
-        else {
-
-            // Check pitstops.
-            for (var i = 0;
-                 i < pitstops.length;
-                 i++) {
-
-                var stop = pitstops[i];
-                if (isNaN(stop) || stop < 0 || stop >= places.length || stop % 1 != 0) {
-
-                    alert("Warning: invalid pitstop (" + stop + ") for element " + j + " (" + name + ")");
-                }
-            }
-        }
+        // Check markers.
+        checkMarker(laps[j].pitstops, "pitstop", places.length, j, name);
+        checkMarker(laps[j].mechanical, "mechanical", places.length, j, name);
     }
 
     // Check for consistent placings.
@@ -157,6 +155,32 @@ function integrityCheck(data) {
             if (count != 1) {
 
                 alert("Warning: data inconsistent: lap " + i + ", position " + j + ", count " + count);
+            }
+        }
+    }
+}
+
+// Check integrity of marker data.
+//
+// marker: marker data.
+// name: driver name.
+// type: text description of marker.
+// max: maximum allowed lap value of marker.
+// index: index of driver in list.
+//
+function checkMarker(marker, type, max, index, name) {
+
+    if (marker != undefined) {
+
+        // Check marker.
+        for (var i = 0;
+             i < marker.length;
+             i++) {
+
+            var stop = marker[i];
+            if (isNaN(stop) || stop < 0 || stop >= max || stop % 1 != 0) {
+
+                alert("Warning: invalid " + type + " (" + stop + ") for element " + index + " (" + name + ")");
             }
         }
     }
@@ -251,11 +275,11 @@ function visualize(data) {
         });
 
     // Add name labels.
-    vis.selectAll('text.name.start')
+    vis.selectAll('text.label.start')
         .data(data.laps)
         .enter()
         .append('svg:text')
-        .attr('class', 'name start')
+        .attr('class', 'label start')
         .attr('x', INSETS.left - PADDING.right)
         .attr('y', function (d) {
 
@@ -280,11 +304,11 @@ function visualize(data) {
             unhighlight(vis);
         });
 
-    vis.selectAll('text.name.finish')
+    vis.selectAll('text.label.finish')
         .data(data.laps)
         .enter()
         .append('svg:text')
-        .attr('class', 'name finish')
+        .attr('class', 'label finish')
         .attr('x', WIDTH - INSETS.right + PADDING.left)
         .attr('y', function (d, i) {
 
@@ -309,57 +333,9 @@ function visualize(data) {
             unhighlight(vis);
         });
 
-    vis.selectAll("circle.marker.pitstop")
-        .data(data.pitstops)
-        .enter()
-        .append("svg:circle")
-        .attr("class", "marker pitstop")
-        .attr("cx", function(d) {
-
-            return SCALES.x(d.lap);
-        })
-        .attr("cy", function(d) {
-
-            return SCALES.y(d.placing - 1);
-        })
-        .attr("r", "10")
-        .style("fill", function(d) {
-
-            return SCALES.clr(d.start);
-        })
-        .on('mouseover', function(d) {
-
-            highlight(vis, d.name);
-        })
-        .on('mouseout', function() {
-
-            unhighlight(vis);
-        });
-
-    vis.selectAll("text.marker.pitstop")
-        .data(data.pitstops)
-        .enter()
-        .append("svg:text")
-        .attr("class", "marker pitstop")
-        .attr("x", function(d) {
-
-            return SCALES.x(d.lap);
-        })
-        .attr("y", function(d) {
-
-            return SCALES.y(d.placing - 1);
-        })
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "middle")
-        .text("P")
-        .on('mouseover', function(d) {
-
-            highlight(vis, d.name);
-        })
-        .on('mouseout', function() {
-
-            unhighlight(vis);
-        });
+    // Add markers.
+    addMarkers(vis, data.pitstops, "pitstop", "P");
+    addMarkers(vis, data.mechanical, "mechanical", "M");
 }
 
 // Highlight driver.
@@ -382,7 +358,7 @@ function highlight(vis, name) {
             return d.name == name ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
         });
 
-    vis.selectAll('text.name')
+    vis.selectAll('text.label')
         .style('opacity', function(d) {
 
             return d.name == name ? HIGHLIGHT_OPACITY : DIMMED_OPACITY;
@@ -400,8 +376,73 @@ function unhighlight(vis) {
         .style('opacity', HIGHLIGHT_OPACITY);
     vis.selectAll('circle')
         .style('opacity', HIGHLIGHT_OPACITY);
-    vis.selectAll('text.name')
+    vis.selectAll('text.label')
         .style('opacity', HIGHLIGHT_OPACITY);
+}
+
+// Add markers.
+//
+// vis: the visualization root.
+// data: marker data.
+// class: marker sub-class.
+// label: marker label.
+//
+function addMarkers(vis, data, cssClass, label) {
+    label = label || "P";
+
+    // Place circle glyph.
+    vis.selectAll("circle.marker." + cssClass)
+        .data(data)
+        .enter()
+        .append("svg:circle")
+        .attr("class", "marker " + cssClass)
+        .attr("cx", function(d) {
+
+            return SCALES.x(d.lap);
+        })
+        .attr("cy", function(d) {
+
+            return SCALES.y(d.placing - 1);
+        })
+        .attr("r", MARKER_RADIUS)
+        .style("fill", function(d) {
+
+            return SCALES.clr(d.start);
+        })
+        .on('mouseover', function(d) {
+
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
+        });
+
+    // Place text.
+    vis.selectAll("text.label." + cssClass)
+        .data(data)
+        .enter()
+        .append("svg:text")
+        .attr("class", "label " + cssClass)
+        .attr("x", function(d) {
+
+            return SCALES.x(d.lap);
+        })
+        .attr("y", function(d) {
+
+            return SCALES.y(d.placing - 1);
+        })
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .text(label)
+        .on('mouseover', function(d) {
+
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
+        });
 }
 
 // Gets the window dimensions.

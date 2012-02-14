@@ -5,7 +5,8 @@
         {
             "name": "Sebastian Vettel",
             "placing": [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            "pitstops": [9]
+            "pitstops": [9],
+            "mechanical": [25]
         },
         {
             "name": "Mark Webber",
@@ -34,8 +35,7 @@
         },
         {
             "name": "Michael Schumacher",
-            "placing": [7],
-            "pitstops": []
+            "placing": [7]
         },
         {
             "name": "Rubens Barrichello",
@@ -50,7 +50,7 @@
         {
             "name": "Adrian Sutil",
             "placing": [10, 8, 8, 8, 8, 8, 7, 9, 5, 2],
-            "pitstops": []
+            "mechanical": [9]
         },
         {
             "name": "Lewis Hamilton",
@@ -59,8 +59,7 @@
         },
         {
             "name": "Sebastien Buemi",
-            "placing": [12],
-            "pitstops": []
+            "placing": [12]
         },
         {
             "name": "Vitantonio Liuzzi",
@@ -74,13 +73,11 @@
         },
         {
             "name": "Nico Hulkenberg",
-            "placing": [15],
-            "pitstops": []
+            "placing": [15]
         },
         {
             "name": "Kamui Kobayashi",
-            "placing": [16],
-            "pitstops": []
+            "placing": [16]
         },
         {
             "name": "Jaime Alguersuari",
@@ -100,12 +97,13 @@
         {
             "name": "Jarno Trulli",
             "placing": [20, 20, 20, 20, 20, 17, 15, 14, 17, 15, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 12, 12, 12, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 11, 11, 11, 11, 10, 10],
-            "pitstops": [1, 8, 29]
+            "pitstops": [1, 8, 29],
+            "mechanical": [0]
         },
         {
             "name": "Bruno Senna",
             "placing": [21, 14, 14, 14, 15],
-            "pitstops": []
+            "mechanical": [4]
         },
         {
             "name": "Karun Chandock",
@@ -115,12 +113,14 @@
         {
             "name": "Timo Glock",
             "placing": [23, 17, 17, 17, 17, 16, 16, 16, 8, 17, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
-            "pitstops": [8, 9]
+            "pitstops": [8, 9],
+            "mechanical": [41]
         },
         {
             "name": "Luca di Grassi",
             "placing": [24, 19, 19, 19, 19, 18, 17, 17, 16, 16, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 16, 16, 16, 16, 16, 17, 16],
-            "pitstops": [10, 25]
+            "pitstops": [10, 25],
+            "mechanical": [26]
         }
     ]
 }
