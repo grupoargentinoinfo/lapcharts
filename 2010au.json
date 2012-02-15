@@ -16,12 +16,14 @@
         {
             "name": "Fernando Alonso",
             "placing": [3, 18, 18, 18, 18, 15, 13, 13, 15, 13, 10, 10, 10, 9, 8, 8, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 6, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-            "pitstops": [8]
+            "pitstops": [8],
+            "accident": [0]
         },
         {
             "name": "Jenson Button",
             "placing": [4, 6, 6, 6, 6, 6, 19, 19, 12, 4, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            "pitstops": [6, 34]
+            "pitstops": [6, 34],
+            "accident": [0]
         },
         {
             "name": "Felipe Massa",
@@ -35,12 +37,14 @@
         },
         {
             "name": "Michael Schumacher",
-            "placing": [7]
+            "placing": [7],
+            "accident": [0]
         },
         {
             "name": "Rubens Barrichello",
             "placing": [8, 9, 9, 9, 9, 9, 8, 7, 10, 8, 7, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 8, 8, 8, 8, 8, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 8, 8],
-            "pitstops": [8, 31]
+            "pitstops": [8, 31],
+            "accident": [55]
         },
         {
             "name": "Robert Kubica",
@@ -55,11 +59,13 @@
         {
             "name": "Lewis Hamilton",
             "placing": [11, 7, 7, 7, 7, 7, 6, 6, 11, 11, 8, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6],
-            "pitstops": [8, 34]
+            "pitstops": [8, 34],
+            "accident": [55]
         },
         {
             "name": "Sebastien Buemi",
-            "placing": [12]
+            "placing": [12],
+            "accident": [0]
         },
         {
             "name": "Vitantonio Liuzzi",
@@ -73,11 +79,13 @@
         },
         {
             "name": "Nico Hulkenberg",
-            "placing": [15]
+            "placing": [15],
+            "accident": [0]
         },
         {
             "name": "Kamui Kobayashi",
-            "placing": [16]
+            "placing": [16],
+            "accident": [0]
         },
         {
             "name": "Jaime Alguersuari",
@@ -87,7 +95,8 @@
         {
             "name": "Vitaly Petrov",
             "placing": [18, 10, 10, 10, 10, 10, 9, 8, 14, 14],
-            "pitstops": [8]
+            "pitstops": [8],
+            "accident": [9]
         },
         {
             "name": "Heikki Kovalainen",

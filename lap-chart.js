@@ -7,7 +7,7 @@ const HEIGHT = DIMENSIONS.height - 100;
 const INSETS = {'left': 150, 'right': 150, 'top': 30, 'bottom': 50};
 
 // Padding.
-const PADDING = {'left': 8, 'right': 8, 'top': 8, 'bottom': 8};
+const PADDING = {'left': 15, 'right': 15, 'top': 8, 'bottom': 8};
 
 // Tick-mark length.
 const TICK_MARK_LENGTH = 8;
@@ -44,6 +44,7 @@ window.onload = function() {
         // Process lap markers..
         data.pitstops = processLapMarkers(data, "pitstops");
         data.mechanical = processLapMarkers(data, "mechanical");
+        data.accident = processLapMarkers(data, "accident");
 
         // Visualize the data.
         visualize(data);
@@ -115,8 +116,10 @@ function integrityCheck(data) {
         }
 
         // Check markers.
-        checkMarker(laps[j].pitstops, "pitstop", places.length, j, name);
-        checkMarker(laps[j].mechanical, "mechanical", places.length, j, name);
+        var maxLaps = places.length;
+        checkMarker(laps[j].pitstops, "pitstop", maxLaps, j, name);
+        checkMarker(laps[j].mechanical, "mechanical", maxLaps, j, name);
+        checkMarker(laps[j].accident, "accident", maxLaps, j, name);
     }
 
     // Check for consistent placings.
@@ -336,6 +339,7 @@ function visualize(data) {
     // Add markers.
     addMarkers(vis, data.pitstops, "pitstop", "P");
     addMarkers(vis, data.mechanical, "mechanical", "M");
+    addMarkers(vis, data.accident, "accident", "X");
 }
 
 // Highlight driver.
@@ -419,11 +423,11 @@ function addMarkers(vis, data, cssClass, label) {
         });
 
     // Place text.
-    vis.selectAll("text.label." + cssClass)
+    vis.selectAll("text.label.marker" + cssClass)
         .data(data)
         .enter()
         .append("svg:text")
-        .attr("class", "label " + cssClass)
+        .attr("class", "label marker" + cssClass)
         .attr("x", function(d) {
 
             return SCALES.x(d.lap);

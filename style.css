@@ -17,6 +17,10 @@ text.label {
     fill: #000000;
 }
 
+text.label.marker {
+    font-weight: bold;
+}
+
 polyline {
     fill: none;
     stroke-width: 5;
