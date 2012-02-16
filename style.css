@@ -21,11 +21,16 @@ text.label.marker {
     font-weight: bold;
 }
 
-polyline {
+polyline.placing {
     fill: none;
     stroke-width: 5;
 }
 
 line.tickLine {
     stroke: #999999;
+}
+
+rect.lapped {
+    stroke: #333333;
+    fill: #333333;
 }

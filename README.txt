@@ -2,6 +2,13 @@ TODO
 
 Title / header / footer etc.
 
-Decorations: pit stops, mechanical failures, collisions, safety car, lapped drivers etc
+Offset either polylines or ticklines by +/-0.5
+
+Integrity check lapped
+
+Place components in functions
+
+Decorations: safety car, lapped drivers etc
 
 Bring highlighted to foreground (depth)
+

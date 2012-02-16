@@ -211,6 +211,29 @@ function visualize(data) {
         .attr('width', WIDTH)
         .attr('height', HEIGHT);
 
+    // Add lapped poly-lines.
+    vis.selectAll('rect.lapped')
+        .data(data.lapped)
+        .enter()
+        .append('svg:rect')
+        .attr('class', 'lapped')
+        .attr('x', function(d, i) {
+
+            return SCALES.x(i);
+        })
+        .attr('y', function(d) {
+
+            return SCALES.y(d > 0 ? d - 1.5 : 0);
+        })
+        .attr('height', function(d) {
+
+            return d > 0 ? SCALES.y.range()[1] - SCALES.y(d - 1.5) : 0;
+        })
+        .attr('width', function(d) {
+
+            return d > 0 ? SCALES.x(1) - SCALES.x(0) : 0;
+        });
+
     // Lap tick-lines.
     vis.selectAll('line')
         .data(SCALES.x.ticks(data.lapCount))
@@ -232,26 +255,15 @@ function visualize(data) {
         });
 
     // Lap labels.
-    vis.selectAll('text.lap')
-        .data(SCALES.x.ticks(data.lapCount))
-        .enter().append('svg:text')
-        .attr('class', 'lap')
-        .attr('x', function(d) {
-
-            return SCALES.x(d - 0.5);
-        })
-        .attr('y', SCALES.y.range()[0] - PADDING.bottom)
-        .attr('text-anchor', 'middle')
-        .text(function(d, i) {
-
-            return i > 0 ? i : '';
-        });
+    addLapLabels(vis, data.lapCount, SCALES.y.range()[0] - PADDING.bottom, '0.0em', 'top');
+    addLapLabels(vis, data.lapCount, SCALES.y.range()[1] + PADDING.top, '0.35em', 'bottom');
 
     // Add lap poly-lines.
-    vis.selectAll('polyline')
+    vis.selectAll('polyline.placing')
         .data(data.laps)
         .enter()
         .append('svg:polyline')
+        .attr('class', 'placing')
         .attr('points', function(d) {
 
             var points = [];
@@ -382,6 +394,29 @@ function unhighlight(vis) {
         .style('opacity', HIGHLIGHT_OPACITY);
     vis.selectAll('text.label')
         .style('opacity', HIGHLIGHT_OPACITY);
+}
+
+// Add lap labels.
+//
+// vis: the data visualization root.
+//
+function addLapLabels(vis, data, y, dy, cssClass) {
+
+    vis.selectAll('text.lap.' + cssClass)
+        .data(SCALES.x.ticks(data))
+        .enter().append('svg:text')
+        .attr('class', 'lap ' + cssClass)
+        .attr('x', function(d) {
+
+            return SCALES.x(d - 0.5);
+        })
+        .attr('y', y)
+        .attr('dy', dy)
+        .attr('text-anchor', 'middle')
+        .text(function(d, i) {
+
+            return i > 0 ? i : '';
+        });
 }
 
 // Add markers.
