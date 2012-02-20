@@ -232,31 +232,8 @@ function visualize(data) {
         .attr('width', WIDTH)
         .attr('height', HEIGHT);
 
-    // Add lapped poly-lines.
-    if (data.lapped != undefined) {
-
-        vis.selectAll('rect.lapped')
-            .data(data.lapped)
-            .enter()
-            .append('svg:rect')
-            .attr('class', 'lapped')
-            .attr('x', function(d, i) {
-
-                return SCALES.x(i);
-            })
-            .attr('y', function(d) {
-
-                return SCALES.y(d > 0 ? d - 1.5 : 0);
-            })
-            .attr('height', function(d) {
-
-                return d > 0 ? SCALES.y.range()[1] - SCALES.y(d - 1.5) : 0;
-            })
-            .attr('width', function(d) {
-
-                return d > 0 ? SCALES.x(1) - SCALES.x(0) : 0;
-            });
-    }
+    // Add lapped element.
+    addLappedElement(vis, data.lapped);
 
     // Lap tick-lines.
     vis.selectAll('line')
@@ -418,6 +395,36 @@ function unhighlight(vis) {
         .style('opacity', HIGHLIGHT_OPACITY);
     vis.selectAll('text.label')
         .style('opacity', HIGHLIGHT_OPACITY);
+}
+
+// Add lapped rectangle elements.
+//
+function addLappedElement(vis, data) {
+
+    if (data != undefined) {
+
+        vis.selectAll('rect.lapped')
+            .data(data)
+            .enter()
+            .append('svg:rect')
+            .attr('class', 'lapped')
+            .attr('x', function(d, i) {
+
+                return SCALES.x(i);
+            })
+            .attr('y', function(d) {
+
+                return SCALES.y(d > 0 ? d - 1.5 : 0);
+            })
+            .attr('height', function(d) {
+
+                return d > 0 ? SCALES.y.range()[1] - SCALES.y(d - 1.5) : 0;
+            })
+            .attr('width', function(d) {
+
+                return d > 0 ? SCALES.x(1) - SCALES.x(0) : 0;
+            });
+    }
 }
 
 // Add lap labels.
