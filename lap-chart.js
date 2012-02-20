@@ -51,40 +51,6 @@ window.onload = function() {
     });
 };
 
-// Process lap markers.
-//
-// data: lap data.
-// key: marker key.
-//
-function processLapMarkers(data, key) {
-
-    var markers = [];
-    var p = 0;
-    for (var i = 0;
-         i < data.laps.length;
-         i++) {
-
-        var lapData = data.laps[i];
-        var laps = lapData[key];
-        if (laps != undefined) {
-            for (var j = 0;
-                 j < laps.length;
-                 j++) {
-
-                var lap = laps[j];
-                var marker = {};
-                marker.start = lapData.placing[0];
-                marker.lap = lap;
-                marker.placing = lapData.placing[lap];
-                marker.name = lapData.name;
-
-                markers[p++] = marker;
-            }
-        }
-    }
-    return markers;
-}
-
 // Check data.
 //
 function integrityCheck(data) {
@@ -210,6 +176,40 @@ function checkMarker(marker, type, max, index, name) {
     }
 }
 
+// Process lap markers.
+//
+// data: lap data.
+// key: marker key.
+//
+function processLapMarkers(data, key) {
+
+    var markers = [];
+    var p = 0;
+    for (var i = 0;
+         i < data.laps.length;
+         i++) {
+
+        var lapData = data.laps[i];
+        var laps = lapData[key];
+        if (laps != undefined) {
+            for (var j = 0;
+                 j < laps.length;
+                 j++) {
+
+                var lap = laps[j];
+                var marker = {};
+                marker.start = lapData.placing[0];
+                marker.lap = lap;
+                marker.placing = lapData.placing[lap];
+                marker.name = lapData.name;
+
+                markers[p++] = marker;
+            }
+        }
+    }
+    return markers;
+}
+
 // Create the visualization.
 //
 // data the lap data object.
@@ -231,6 +231,9 @@ function visualize(data) {
         .append('svg:svg')
         .attr('width', WIDTH)
         .attr('height', HEIGHT);
+
+    // Add safety car element.
+    addSafetyElement(vis, data.safety);
 
     // Add lapped element.
     addLappedElement(vis, data.lapped);
@@ -397,11 +400,48 @@ function unhighlight(vis) {
         .style('opacity', HIGHLIGHT_OPACITY);
 }
 
+function addSafetyElement(vis, data) {
+
+    if (data != undefined) {
+
+        var y = SCALES.y.range()[0] - y;
+        var height = SCALES.y.range()[1];
+        var width = SCALES.x(1) - SCALES.x(0);
+
+        vis.selectAll('rect.safety')
+            .data(data)
+            .enter()
+            .append('svg:rect')
+            .attr('class', 'safety')
+            .attr('x', function(d) {
+
+                return SCALES.x(d - 1);
+            })
+            .attr('y', function() {
+
+                return y;
+            })
+            .attr('height', function() {
+
+                return height;
+            })
+            .attr('width', function() {
+
+                return width;
+            });
+    }
+}
+
 // Add lapped rectangle elements.
+//
+// vis: the data visualization root.
+// data: the lapped data.
 //
 function addLappedElement(vis, data) {
 
     if (data != undefined) {
+
+        var width = SCALES.x(1) - SCALES.x(0);
 
         vis.selectAll('rect.lapped')
             .data(data)
@@ -422,7 +462,7 @@ function addLappedElement(vis, data) {
             })
             .attr('width', function(d) {
 
-                return d > 0 ? SCALES.x(1) - SCALES.x(0) : 0;
+                return d > 0 ? width : 0;
             });
     }
 }

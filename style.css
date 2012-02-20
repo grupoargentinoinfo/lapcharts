@@ -34,3 +34,8 @@ rect.lapped {
     stroke: #333333;
     fill: #333333;
 }
+
+rect.safety{
+    stroke: #330000;
+    fill: #330000;
+}
