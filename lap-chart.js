@@ -85,7 +85,7 @@ function processLapMarkers(data, key) {
     return markers;
 }
 
-// Check data
+// Check data.
 //
 function integrityCheck(data) {
 
@@ -161,6 +161,27 @@ function integrityCheck(data) {
             }
         }
     }
+
+    // Check lapped data.
+    var lapped = data.lapped;
+    if (lapped != undefined) {
+
+        if (lapped.length != data.lapCount) {
+
+            alert("Lapped array length (" + lapped.length + ") incorrect - expected length " + data.lapCount);
+        }
+
+        for (j = 1;
+             j < lapped.length;
+             j++) {
+
+            if (data.lapped[j] > data.laps.length) {
+
+                alert("Lapped data incorrect: element " + j + " (" + data.lapped[j]
+                    + ") is greater than max placing (" + data.laps.length + ")");
+            }
+        }
+    }
 }
 
 // Check integrity of marker data.
@@ -212,27 +233,30 @@ function visualize(data) {
         .attr('height', HEIGHT);
 
     // Add lapped poly-lines.
-    vis.selectAll('rect.lapped')
-        .data(data.lapped)
-        .enter()
-        .append('svg:rect')
-        .attr('class', 'lapped')
-        .attr('x', function(d, i) {
+    if (data.lapped != undefined) {
 
-            return SCALES.x(i);
-        })
-        .attr('y', function(d) {
+        vis.selectAll('rect.lapped')
+            .data(data.lapped)
+            .enter()
+            .append('svg:rect')
+            .attr('class', 'lapped')
+            .attr('x', function(d, i) {
 
-            return SCALES.y(d > 0 ? d - 1.5 : 0);
-        })
-        .attr('height', function(d) {
+                return SCALES.x(i);
+            })
+            .attr('y', function(d) {
 
-            return d > 0 ? SCALES.y.range()[1] - SCALES.y(d - 1.5) : 0;
-        })
-        .attr('width', function(d) {
+                return SCALES.y(d > 0 ? d - 1.5 : 0);
+            })
+            .attr('height', function(d) {
 
-            return d > 0 ? SCALES.x(1) - SCALES.x(0) : 0;
-        });
+                return d > 0 ? SCALES.y.range()[1] - SCALES.y(d - 1.5) : 0;
+            })
+            .attr('width', function(d) {
+
+                return d > 0 ? SCALES.x(1) - SCALES.x(0) : 0;
+            });
+    }
 
     // Lap tick-lines.
     vis.selectAll('line')
