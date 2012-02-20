@@ -400,6 +400,11 @@ function unhighlight(vis) {
         .style('opacity', HIGHLIGHT_OPACITY);
 }
 
+// Add safety car laps (rectanle elements).
+//
+// vis: the data visualization root.
+// data: safety car laps.
+//
 function addSafetyElement(vis, data) {
 
     if (data != undefined) {
