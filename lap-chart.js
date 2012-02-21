@@ -22,7 +22,6 @@ const SCALES = {};
 var DIMMED_OPACITY = 0.2;
 var HIGHLIGHT_OPACITY = 1.0;
 
-
 // Visualize when document has loaded.
 //
 window.onload = function() {
@@ -52,6 +51,8 @@ window.onload = function() {
 };
 
 // Check data.
+//
+// data: the data to check.
 //
 function integrityCheck(data) {
 
@@ -89,16 +90,34 @@ function integrityCheck(data) {
     }
 
     // Check for consistent placings.
-    for (i = 0;
+    checkPlacings(data);
+
+    // Check lapped data.
+    checkLapped(data.lapped, lapCount, laps.length);
+
+    // Check safety car data.
+    checkSafetyCar(data.safety, lapCount);
+}
+
+// Check placings data.
+//
+// data: the data to check.
+//
+function checkPlacings(data) {
+
+    var laps = data.laps;
+    var lapCount = data.lapCount;
+
+    for (var i = 0;
          i < lapCount;
          i++) {
 
         var positions = [];
-        for (j = 0;
+        for (var j = 0;
              j < laps.length;
              j++) {
 
-            places = laps[j].placing;
+            var places = laps[j].placing;
             if (places.length > i) {
 
                 // Valid placing?
@@ -127,27 +146,6 @@ function integrityCheck(data) {
             }
         }
     }
-
-    // Check lapped data.
-    var lapped = data.lapped;
-    if (lapped != undefined) {
-
-        if (lapped.length != data.lapCount) {
-
-            alert("Lapped array length (" + lapped.length + ") incorrect - expected length " + data.lapCount);
-        }
-
-        for (j = 1;
-             j < lapped.length;
-             j++) {
-
-            if (data.lapped[j] > data.laps.length) {
-
-                alert("Lapped data incorrect: element " + j + " (" + data.lapped[j]
-                    + ") is greater than max placing (" + data.laps.length + ")");
-            }
-        }
-    }
 }
 
 // Check integrity of marker data.
@@ -171,6 +169,61 @@ function checkMarker(marker, type, max, index, name) {
             if (isNaN(stop) || stop < 0 || stop >= max || stop % 1 != 0) {
 
                 alert("Warning: invalid " + type + " (" + stop + ") for element " + index + " (" + name + ")");
+            }
+        }
+    }
+}
+
+// Check lapped data.
+//
+// lapped: the lapped data.
+// lapCount: number of laps.
+// driverCount: number of drivers.
+//
+function checkLapped(lapped, lapCount, driverCount) {
+
+    if (lapped != undefined) {
+
+        var lappedLength = lapped.length;
+        if (lappedLength != lapCount) {
+
+            alert("Lapped array length (" + lappedLength + ") incorrect - expected length " + lapCount);
+        }
+
+        for (var j = 1;
+             j < lappedLength;
+             j++) {
+
+            // Valid position.
+            var position = lapped[j];
+            if (isNaN(position) || position % 1 != 0 || position < -1 || position > driverCount) {
+
+                alert("Invalid lapped position: element " + j + " (" + position
+                    + "); expected integer between -1 and " + driverCount);
+            }
+        }
+    }
+}
+
+// Check safety car data.
+//
+// safety: safety car data.
+// lapCount: number of laps.
+//
+function checkSafetyCar(safety, lapCount) {
+
+    if (safety != undefined) {
+
+        for (var i = 0;
+             i < safety.length;
+             i++) {
+
+            // Valid lap?
+            var lap = safety[i];
+            if (isNaN(lap) || lap < 0 || lap % 1 != 0 || lap > lapCount) {
+
+                alert("Invalid safety car lap: element " + i + " (" + lap
+                    + "); expected integer between 0 and " + lapCount);
             }
         }
     }
@@ -216,15 +269,8 @@ function processLapMarkers(data, key) {
 //
 function visualize(data) {
 
-    SCALES.x = d3.scale.linear()
-        .domain([0, data.lapCount])
-        .range([INSETS.left, WIDTH - INSETS.right]);
-
-    SCALES.y = d3.scale.linear()
-        .domain([0, data.laps.length - 1])
-        .range([INSETS.top, HEIGHT - INSETS.bottom]);
-
-    SCALES.clr = d3.scale.category20();
+    // Configure scales.
+    configureScales(data);
 
     // Root panel.
     var vis = d3.select('#chart')
@@ -358,6 +404,23 @@ function visualize(data) {
     addMarkers(vis, data.accident, "accident", "X");
 }
 
+// Configure the scales.
+//
+// data: data set.
+//
+function configureScales(data) {
+
+    SCALES.x = d3.scale.linear()
+        .domain([0, data.lapCount])
+        .range([INSETS.left, WIDTH - INSETS.right]);
+
+    SCALES.y = d3.scale.linear()
+        .domain([0, data.laps.length - 1])
+        .range([INSETS.top, HEIGHT - INSETS.bottom]);
+
+    SCALES.clr = d3.scale.category20();
+}
+
 // Highlight driver.
 //
 // vis: the data visualization root.
@@ -409,8 +472,8 @@ function addSafetyElement(vis, data) {
 
     if (data != undefined) {
 
-        var y = SCALES.y.range()[0] - y;
-        var height = SCALES.y.range()[1];
+        var y = SCALES.y.range()[0];
+        var height = SCALES.y.range()[1] - y;
         var width = SCALES.x(1) - SCALES.x(0);
 
         vis.selectAll('rect.safety')
