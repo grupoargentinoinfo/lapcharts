@@ -7,7 +7,7 @@ const HEIGHT = DIMENSIONS.height - 100;
 const INSETS = {'left': 150, 'right': 150, 'top': 30, 'bottom': 50};
 
 // Padding.
-const PADDING = {'left': 15, 'right': 15, 'top': 8, 'bottom': 8};
+const PADDING = {'left': 20, 'right': 20, 'top': 15, 'bottom': 15};
 
 // Tick-mark length.
 const TICK_MARK_LENGTH = 8;
@@ -19,7 +19,7 @@ const MARKER_RADIUS = 10;
 const SCALES = {};
 
 // Opacity of dimmed objects.
-var DIMMED_OPACITY = 0.2;
+var DIMMED_OPACITY = 0.3;
 var HIGHLIGHT_OPACITY = 1.0;
 
 // Visualize when document has loaded.
@@ -59,6 +59,23 @@ function integrityCheck(data) {
     var laps = data.laps;
     var lapCount = data.lapCount;
 
+    // Check lap data.
+    checkLaps(laps, lapCount);
+
+    // Check lapped data.
+    checkLapped(data.lapped, lapCount, laps.length);
+
+    // Check safety car data.
+    checkSafetyCar(data.safety, lapCount);
+}
+
+// Check lap data.
+//
+// laps: the lap data.
+// lapCount: number of laps.
+//
+function checkLaps(laps, lapCount) {
+
     for (var j = 0;
          j < laps.length;
          j++) {
@@ -89,35 +106,16 @@ function integrityCheck(data) {
         checkMarker(laps[j].accident, "accident", maxLaps, j, name);
     }
 
-    // Check for consistent placings.
-    checkPlacings(data);
-
-    // Check lapped data.
-    checkLapped(data.lapped, lapCount, laps.length);
-
-    // Check safety car data.
-    checkSafetyCar(data.safety, lapCount);
-}
-
-// Check placings data.
-//
-// data: the data to check.
-//
-function checkPlacings(data) {
-
-    var laps = data.laps;
-    var lapCount = data.lapCount;
-
     for (var i = 0;
          i < lapCount;
          i++) {
 
         var positions = [];
-        for (var j = 0;
+        for (j = 0;
              j < laps.length;
              j++) {
 
-            var places = laps[j].placing;
+            places = laps[j].placing;
             if (places.length > i) {
 
                 // Valid placing?
@@ -285,117 +283,25 @@ function visualize(data) {
     addLappedElement(vis, data.lapped);
 
     // Lap tick-lines.
-    vis.selectAll('line')
-        .data(SCALES.x.ticks(data.lapCount))
-        .enter().append('svg:line')
-        .attr('class', 'tickLine')
-        .attr('x1', function(d) {
-
-            return SCALES.x(d);
-        })
-        .attr('x2', function(d) {
-
-            return SCALES.x(d);
-        })
-        .attr('y1', SCALES.y.range()[0] - TICK_MARK_LENGTH)
-        .attr('y2', SCALES.y.range()[1] + TICK_MARK_LENGTH)
-        .attr('visibility', function(d) {
-
-            return d > 0 && d < data.lapCount ? 'visible' : 'hidden'
-        });
+    addLapTickLines(vis, data.lapCount);
 
     // Lap labels.
     addLapLabels(vis, data.lapCount, SCALES.y.range()[0] - PADDING.bottom, '0.0em', 'top');
     addLapLabels(vis, data.lapCount, SCALES.y.range()[1] + PADDING.top, '0.35em', 'bottom');
 
-    // Add lap poly-lines.
-    vis.selectAll('polyline.placing')
-        .data(data.laps)
-        .enter()
-        .append('svg:polyline')
-        .attr('class', 'placing')
-        .attr('points', function(d) {
-
-            var points = [];
-            for (var i = 0;
-                 i < d.placing.length;
-                 i++) {
-
-                points[i] = SCALES.x(i) + ',' + SCALES.y(d.placing[i] - 1);
-            }
-
-            return points.join(' ');
-        })
-        .style('stroke', function(d) {
-
-            return SCALES.clr(d.placing[0]);
-        })
-        .on('mouseover', function(d) {
-
-            highlight(vis, d.name);
-        })
-        .on('mouseout', function() {
-
-            unhighlight(vis);
-        });
+    // Add placings poly-lines.
+    addPlacingsLines(vis, data.laps);
 
     // Add name labels.
-    vis.selectAll('text.label.start')
-        .data(data.laps)
-        .enter()
-        .append('svg:text')
-        .attr('class', 'label start')
-        .attr('x', INSETS.left - PADDING.right)
+    addDriverLabels(vis, data.laps, 'pole', SCALES.x(0) - PADDING.right, 'end')
         .attr('y', function (d) {
 
             return SCALES.y(d.placing[0] - 1);
-        })
-        .attr('dy', '0.35em')
-        .attr('text-anchor', 'end')
-        .text(function(d) {
-
-            return d.name;
-        })
-        .style('fill', function(d) {
-
-            return SCALES.clr(d.placing[0]);
-        })
-        .on('mouseover', function(d) {
-
-            highlight(vis, d.name);
-        })
-        .on('mouseout', function() {
-
-            unhighlight(vis);
         });
-
-    vis.selectAll('text.label.finish')
-        .data(data.laps)
-        .enter()
-        .append('svg:text')
-        .attr('class', 'label finish')
-        .attr('x', WIDTH - INSETS.right + PADDING.left)
-        .attr('y', function (d, i) {
+    addDriverLabels(vis, data.laps, 'flag', SCALES.x(data.lapCount) + PADDING.left, 'start')
+            .attr('y', function (d, i) {
 
             return SCALES.y(i);
-        })
-        .attr('dy', '0.35em')
-        .attr('text-anchor', 'start')
-        .text(function(d) {
-
-            return d.name;
-        })
-        .style('fill', function(d) {
-
-            return SCALES.clr(d.placing[0]);
-        })
-        .on('mouseover', function(d) {
-
-            highlight(vis, d.name);
-        })
-        .on('mouseout', function() {
-
-            unhighlight(vis);
         });
 
     // Add markers.
@@ -483,7 +389,7 @@ function addSafetyElement(vis, data) {
             .attr('class', 'safety')
             .attr('x', function(d) {
 
-                return SCALES.x(d - 1);
+                return SCALES.x(d - 0.5);
             })
             .attr('y', function() {
 
@@ -518,7 +424,7 @@ function addLappedElement(vis, data) {
             .attr('class', 'lapped')
             .attr('x', function(d, i) {
 
-                return SCALES.x(i);
+                return SCALES.x(i + 0.5);
             })
             .attr('y', function(d) {
 
@@ -534,10 +440,40 @@ function addLappedElement(vis, data) {
             });
     }
 }
+// Add lap tick-lines.
+//
+// vis: the data visualization root.
+// lapCount: number of laps.
+//
+function addLapTickLines(vis, lapCount) {
+
+    vis.selectAll('line.tickLine')
+        .data(SCALES.x.ticks(lapCount))
+        .enter().append('svg:line')
+        .attr('class', 'tickLine')
+        .attr('x1', function(d) {
+
+            return SCALES.x(d + 0.5);
+        })
+        .attr('x2', function(d) {
+
+            return SCALES.x(d + 0.5);
+        })
+        .attr('y1', SCALES.y.range()[0] - TICK_MARK_LENGTH)
+        .attr('y2', SCALES.y.range()[1] + TICK_MARK_LENGTH)
+        .attr('visibility', function(d) {
+
+            return d <= lapCount ? 'visible' : 'hidden'
+        });
+}
 
 // Add lap labels.
 //
 // vis: the data visualization root.
+// data: lap data.
+// y: y position of labels.
+// dy: y offset.
+// cssClass: CSS class id.
 //
 function addLapLabels(vis, data, y, dy, cssClass) {
 
@@ -547,7 +483,7 @@ function addLapLabels(vis, data, y, dy, cssClass) {
         .attr('class', 'lap ' + cssClass)
         .attr('x', function(d) {
 
-            return SCALES.x(d - 0.5);
+            return SCALES.x(d);
         })
         .attr('y', y)
         .attr('dy', dy)
@@ -555,6 +491,82 @@ function addLapLabels(vis, data, y, dy, cssClass) {
         .text(function(d, i) {
 
             return i > 0 ? i : '';
+        });
+}
+
+// Add placings polyline elements.
+//
+// vis: the visualization root.
+// laps: lap data.
+//
+function addPlacingsLines(vis, laps) {
+
+    vis.selectAll('polyline.placing')
+        .data(laps)
+        .enter()
+        .append('svg:polyline')
+        .attr('class', 'placing')
+        .attr('points', function(d) {
+
+            var points = [];
+            for (var i = 0;
+                 i < d.placing.length;
+                 i++) {
+
+                points[i] = SCALES.x(i) + ',' + SCALES.y(d.placing[i] - 1);
+            }
+
+            if (points.length > 0)
+                points.push(SCALES.x(i - 0.5) + ',' + SCALES.y(d.placing[i - 1] - 1));
+
+            return points.join(' ');
+        })
+        .style('stroke', function(d) {
+
+            return SCALES.clr(d.placing[0]);
+        })
+        .on('mouseover', function(d) {
+
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
+        });
+}
+
+// Add driver name labels.
+//
+// vis: the data visualization root.
+// laps: the lap data.
+// cssClass: CSS class id.
+// textAnchor: text-anchor value.
+//
+function addDriverLabels(vis, laps, cssClass, x, textAnchor) {
+
+    return vis.selectAll('text.label.' + cssClass)
+        .data(laps)
+        .enter()
+        .append('svg:text')
+        .attr('class', 'label ' + cssClass)
+        .attr('x', x)
+        .attr('dy', '0.35em')
+        .attr('text-anchor', textAnchor)
+        .text(function(d) {
+
+            return d.name;
+        })
+        .style('fill', function(d) {
+
+            return SCALES.clr(d.placing[0]);
+        })
+        .on('mouseover', function(d) {
+
+            highlight(vis, d.name);
+        })
+        .on('mouseout', function() {
+
+            unhighlight(vis);
         });
 }
 
