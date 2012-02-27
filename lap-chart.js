@@ -4,7 +4,7 @@ const WIDTH = DIMENSIONS.width;
 const HEIGHT = DIMENSIONS.height - 100;
 
 // Insets.
-const INSETS = {'left': 150, 'right': 150, 'top': 30, 'bottom': 50};
+const INSETS = {'left': 150, 'right': 150, 'top': 30, 'bottom': 30};
 
 // Padding.
 const PADDING = {'left': 20, 'right': 20, 'top': 15, 'bottom': 15};
@@ -13,7 +13,7 @@ const PADDING = {'left': 20, 'right': 20, 'top': 15, 'bottom': 15};
 const TICK_MARK_LENGTH = 8;
 
 // Marker radius.
-const MARKER_RADIUS = 10;
+const MARKER_RADIUS = 12;
 
 // Scales.
 const SCALES = {};
@@ -661,4 +661,3 @@ function getWindowDimensions() {
 
     return {'width': width, 'height': height};
 }
-

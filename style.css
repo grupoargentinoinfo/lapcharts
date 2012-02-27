@@ -8,6 +8,32 @@ body {
     overflow: hidden;
 }
 
+a:link {
+    color: #ccccff;
+}
+a:visited {
+    color: #cccccc;
+}
+a:active {
+    color: #ffccff;
+}
+a.hover {
+    color: #ffcccc;
+}
+
+.title {
+    float: left;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.attrib {
+    float: right;
+    font-size: 14px;
+    color: #ffffff;
+}
+
 text {
     font-family: sans-serif;
     fill: #999999;
