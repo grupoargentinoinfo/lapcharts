@@ -34,8 +34,7 @@ a.hover {
     color: #ffffff;
 }
 
-text {
-    font-family: sans-serif;
+text.lap {
     fill: #999999;
 }
 
@@ -56,12 +55,14 @@ line.tickLine {
     stroke: #999999;
 }
 
-rect.lapped {
+.lapped {
+    background-color: #333333;
     stroke: #333333;
     fill: #333333;
 }
 
-rect.safety{
+.safety{
+    background-color: #330000;
     stroke: #330000;
     fill: #330000;
 }
