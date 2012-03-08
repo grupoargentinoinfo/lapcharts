@@ -32,7 +32,7 @@ window.onload = function() {
         // Check integrity.
         integrityCheck(data);
 
-        // Sort on finishing order.
+        // Sort laps on finishing order.
         data.laps.sort(function(a, b) {
 
             var aLaps = a.placing.length;
