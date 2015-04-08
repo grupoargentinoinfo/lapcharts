@@ -27,7 +27,8 @@ var HIGHLIGHT_OPACITY = 1.0;
 window.onload = function() {
 
     // Load data.
-    d3.json("2010au.json", function(data) {
+    d3.json("weekly_rimo_20150407.json", function(data) {
+    //d3.json("2010au.json", function(data) {
 
         // Check integrity.
         integrityCheck(data);
@@ -183,7 +184,7 @@ function checkLapped(lapped, lapCount, driverCount) {
     if (lapped != undefined) {
 
         var lappedLength = lapped.length;
-        if (lappedLength != lapCount) {
+        if (lappedLength > lapCount) {
 
             alert("Lapped array length (" + lappedLength + ") incorrect - expected length " + lapCount);
         }
@@ -319,6 +320,7 @@ function configureScales(data) {
     SCALES.x = d3.scale.linear()
         .domain([0, data.lapCount])
         .range([INSETS.left, WIDTH - INSETS.right]);
+        //.ticks(5);
 
     SCALES.y = d3.scale.linear()
         .domain([0, data.laps.length - 1])
@@ -490,7 +492,7 @@ function addLapLabels(vis, data, y, dy, cssClass) {
         .attr('text-anchor', 'middle')
         .text(function(d, i) {
 
-            return i > 0 ? i : '';
+            return i%5 == 0 ? i : '';
         });
 }
 
