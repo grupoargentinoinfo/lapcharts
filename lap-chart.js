@@ -27,8 +27,8 @@ var HIGHLIGHT_OPACITY = 1.0;
 window.onload = function() {
 
     // Load data.
-    d3.json("weekly_rimo_20150407.json", function(data) {
-    //d3.json("2010au.json", function(data) {
+    path = d3.select("#chart").attr("json");
+    d3.json(path, function(data) {
 
         // Check integrity.
         integrityCheck(data);
