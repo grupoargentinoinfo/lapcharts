@@ -2,13 +2,21 @@
 
 import json
 import sys
+import urllib2
 from pprint import pprint
 
 if len(sys.argv) != 2:
     print "Usage: %s <filename>" % sys.argv[0]
 
-with open(sys.argv[1], 'r') as f:
+data = {}
+
+try:
+    id = int(sys.argv[1])
+    f = urllib2.urlopen('http://mylaps.com/api/eventlapchart?id=%d' % (id))
     data = json.load(f)
+except:
+    with open(sys.argv[1], 'r') as f:
+        data = json.load(f)
 
 participants = {}
 lapCount = data[u'lapchart'][u'laps'][-1] + 1
