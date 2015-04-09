@@ -483,7 +483,7 @@ function addLapTickLines(vis, lapCount) {
 function addLapLabels(vis, data, y, dy, cssClass) {
 
     vis.selectAll('text.lap.' + cssClass)
-        .data(SCALES.x.ticks(data))
+        .data(SCALES.x.ticks(data/5))
         .enter().append('svg:text')
         .attr('class', 'lap ' + cssClass)
         .attr('x', function(d) {
@@ -495,7 +495,7 @@ function addLapLabels(vis, data, y, dy, cssClass) {
         .attr('text-anchor', 'middle')
         .text(function(d, i) {
 
-            return i%5 == 0 ? i : '';
+            return i * 5;
         });
 }
 
