@@ -33,6 +33,9 @@ window.onload = function() {
         // Check integrity.
         integrityCheck(data);
 
+        // Set title
+        d3.select("#title").text(data.event + " " + data.datetime);
+
         // Sort laps on finishing order.
         data.laps.sort(function(a, b) {
 

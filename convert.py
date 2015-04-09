@@ -48,4 +48,6 @@ for p in participants.itervalues():
         })
     
 
+out[u'event'] = data[u'session'][u'name']
+out[u'datetime'] = data[u'session'][u'dateTime']
 print json.dumps(out)
