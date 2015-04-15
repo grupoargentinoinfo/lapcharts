@@ -40,6 +40,12 @@ console.log("function");
                     //min: 0,
                     //max: 110
                 },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
+                },
                 legend: {
                     show: true,
                     position: "sw",
@@ -71,6 +77,57 @@ console.log("function");
                     plot.draw();
                 }
             });
+
+            // add zoom out button 
+
+            $("<div class='button' style='left:120px;bottom:120px'>zoom out</div>")
+                .appendTo(container)
+                .click(function (event) {
+                    event.preventDefault();
+                    plot.zoomOut();
+                });
+
+            // add reset buutton
+
+            $("<div class='button' style='left:143px;bottom:80px'>R</div>")
+                .appendTo(container)
+                .click(function (event) {
+                    event.preventDefault();
+                    $.each(plot.getAxes(), function (_, axis) {
+                        var opts = axis.options;
+                        opts.min = opts.orig_min;
+                        opts.max = opts.orig_max;
+                        console.log(axis);
+                        plot.setupGrid();
+                        plot.draw();
+                    });
+                });
+            // and add panning buttons
+
+            // little helper for taking the repetitive work out of placing
+            // panning arrows
+
+            function addArrow(dir, left, bottom, offset) {
+                $("<img class='button' src='arrow-" + dir + ".gif' style='left:" + left + "px;bottom:" + bottom + "px'>")
+                    .appendTo(container)
+                    .click(function (e) {
+                        e.preventDefault();
+                        plot.pan(offset);
+                    });
+            }
+
+            addArrow("left", 125, 80, { left: -100 });
+            addArrow("right", 155, 80, { left: 100 });
+            addArrow("up", 140, 95, { top: -100 });
+            addArrow("down", 140, 65, { top: 100 });
+
+            $.each(plot.getAxes(), function (_, axis) {
+                var opts = axis.options;
+                opts.orig_min = axis.min;
+                opts.orig_max = axis.max;
+                console.log(axis);
+            });
+
         });
 
 });
