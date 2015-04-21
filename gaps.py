@@ -22,32 +22,31 @@ def cached_open(url):
 
     return open(filename, 'r')
 
+id = '3441037'
+
 handicaps = {
-    u'18': '0',
-    u'2': '14',
-    u'11': '25',
-    u'13': '30',
-    u'12': '30.5',
-    u'10': '34',
-    u'21': '37',
-    u'6': '40',
-    u'4': '45',
-    u'22': '62',
-    u'3': '65.3',
-    u'19': '67',
-    u'16': '74.7',
+    u'4': '0',
+    u'19': '15',
+    u'6': '18.7',
+    u'20': '21',
+    u'13': '21.4',
+    u'3': '38',
+    u'21': '42.046',
+    u'2': '50.390',
+    u'11': '52.325',
+    u'17': '53',
 }
 
 
 karts = {}
 
-f = cached_open('http://mylaps.com/api/eventclassification?id=3420139&perClass=')
+f = cached_open('http://mylaps.com/api/eventclassification?id=%s&perClass=' % (id))
 classification = json.load(f)
 for kart in classification[u'classification'][u'rows'][u'default']:
     finish_position = kart[u'link'].split('=')[-1]
     #print kart[u'driver'], finish_position
 
-    f = cached_open('http://mylaps.com/api/eventlaptimes?id=3420139&finishPosition=%s' % (finish_position))
+    f = cached_open('http://mylaps.com/api/eventlaptimes?id=%s&finishPosition=%s' % (id, finish_position))
     laps = json.load(f)
 
     ts = Decimal(handicaps[kart[u'start_number']])
@@ -79,3 +78,5 @@ for lap, times in laptimes.iteritems():
         gaps[team].append((lap, float(lead_ts - ts)))
 
 print json.dumps([{'label': g, 'data': gaps[g]} for g in gaps])
+#for g in gaps:
+#    print g, gaps[g][-1][1]
