@@ -2,7 +2,6 @@
 
 from os import path as op
 import datetime
-import socket
 from tornado import web, ioloop, iostream
 from tornadio2 import SocketConnection, TornadioRouter, SocketServer
 import rmonitor
@@ -10,20 +9,44 @@ import rmonitor
 
 ROOT = op.normpath(op.dirname(__file__))
 
+class Session(object):
+    def __init__(self, rmclient):
+        self.rmclient = rmclient
+        self.rmclient.callback = self.on_msg
+        self.racers = {}
+        self.comps = {}
+        self.laps = {}
+        self.last_lap = 0
+        self.leader_time = None
 
-class RMonitorClient(object):
-    def __init__(self, addr):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
-        self.stream = tornado.iostream.IOStream(s)
-        self.stream.connect(addr, self.join)
+    def on_msg(self, msg):
+        try:
+            #print 'Session.on_msg:' , msg
+            if isinstance(msg, rmonitor.Comp):
+                self.racers[msg.regno] = msg
+                self.comps[msg.regno] = {}
 
-    def join(self):
-        #self.stream.write('JOIN')
-        self.read_until('\n', self.on_line)
+            elif isinstance(msg, rmonitor.Run):
+                self.name = msg.name
+                #TODO broadcast to client
+                print {regno: ' '.join((racer.firstName, racer.lastName)) for regno,racer in self.racers.iteritems()}
+               
 
-    def on_line(self, data):
-        print 'Got data', data
+            elif isinstance(msg, rmonitor.Race):
+                if msg.lap < 1:
+                    return
 
+                if msg.lap > self.last_lap and msg.pos == 1:
+                    self.laps[msg.lap] = msg.ts
+                    self.last_lap = msg.lap
+
+                if not msg.lap in self.comps[msg.regno]:
+                    gap = (msg.ts - self.laps[msg.lap]).total_seconds()
+                    self.comps[msg.regno][msg.lap] = gap
+                    #TODO broadcast
+                    print (msg.regno, msg.lap, gap)
+        except Exception as e:
+            print e
 
 
 class IndexHandler(web.RequestHandler):
@@ -88,4 +111,12 @@ if __name__ == "__main__":
     logging.getLogger().setLevel(logging.DEBUG)
 
     # Create and start tornadio server
-    SocketServer(application)
+    #SocketServer(application)
+
+    def printer(msg):
+        print 'In cb:', msg
+
+    rm = rmonitor.RMonitorClient(('127.0.0.1', 8005))
+    session = Session(rm)
+
+    ioloop.IOLoop.current().start()
