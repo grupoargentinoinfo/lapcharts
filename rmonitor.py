@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
+import json
 import socket
 import datetime
 import tornado.iostream
+import tornado.httpclient
 
 zero = datetime.datetime(1900, 1, 1, 0, 0, 0)
 
@@ -69,20 +71,32 @@ def parse(line):
 
 
 class RMonitorClient(object):
-    def __init__(self, addr, callback=None):
+    def __init__(self, accountID, callback=None):
         self.callback = callback
+        self.httpclient = tornado.httpclient.AsyncHTTPClient()
+        self.httpclient.fetch('http://api.race-monitor.com/Info/WebRaceList?accountID=%s&seriesID=0&raceID=0' % (accountID), self.connect)
+
+    def connect(self, response):
+        if response.error:
+            raise response.error
+
+        self.config = json.loads(response.body)
+        self.current_race = self.config['CurrentRaces'][0]
+
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
         self.stream = tornado.iostream.IOStream(s)
-        self.stream.connect(addr, self.join)
+        self.stream.connect((self.current_race['IPAddress'], 50000), self.join)
 
     def join(self):
-        #self.stream.write('JOIN')
+        join_str = '$join,%s,%s\n' % (self.current_race['Instance'], self.config['LiveTimingToken'])
+        print join_str.encode('utf-8')
+        self.stream.write(join_str.encode('utf-8'))
         self.stream.read_until('\n', self.on_line)
 
     def on_line(self, data):
         try:
             data = data.rstrip()
-            #print 'Got data', data
+            print 'Got data', data
             msg = parse(data)
             if msg:
                 #print 'Msg:', msg
@@ -90,7 +104,8 @@ class RMonitorClient(object):
                     self.callback(msg)
 
             self.stream.read_until('\n', self.on_line)
-        except:
+        except Exception as e:
+            print e
             self.stream.close()
 
 
