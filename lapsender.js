@@ -11,26 +11,30 @@ console.log("function");
     container.height(height);
 
     var plot;
+    var series;
 
-    var sock = new io.connect('http://' + window.location.host),
-        chat = new io.connect('http://' + window.location.host + '/laps');
-        //ping = new io.connect('http://' + window.location.host + '/ping');
+    var laps = new io.connect('http://' + window.location.host.split(":")[0] + ':8001/laps');
 
     // Establish event handlers
-    sock.on('disconnect', function() {
+    laps.on('disconnect', function() {
         sock.socket.reconnect();
     });
 
-    chat.on('message', function(data) {
+    laps.on('message', function(data) {
         console.log(data);
 
         switch (data.type) {
             case "init":
                 console.log("Draw plot");
+                series = data.data;
                 init_plot(data.data);
                 break;
+            case "gap":
+                console.log("Update plot with gap data " + data.data);
+                update_plot(data.data);
+                break;
             default:
-                console.log("Unknown type" + data.type);
+                console.log("Unknown type " + data.type);
         };
     });
 
@@ -148,6 +152,21 @@ console.log("function");
             console.log(axis);
         });
 
+    };
+
+    function update_plot(gap) {
+        //console.log(gap);
+        //console.log(series);
+
+        for (var i = 0; i < series.length; i++) {
+            if (series[i].regno == gap[0]) {
+                series[i].data.push([gap[1], gap[2]]);
+            }
+        }
+
+        plot.setData(series);
+        plot.setupGrid();
+        plot.draw();
     };
 
 });
