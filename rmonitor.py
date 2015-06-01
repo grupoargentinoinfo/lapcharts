@@ -2,6 +2,7 @@
 
 import json
 import socket
+import logging
 import datetime
 import tornado.iostream
 import tornado.httpclient
@@ -89,14 +90,14 @@ class RMonitorClient(object):
 
     def join(self):
         join_str = '$join,%s,%s\n' % (self.current_race['Instance'], self.config['LiveTimingToken'])
-        print join_str.encode('utf-8')
+        #print join_str.encode('utf-8')
         self.stream.write(join_str.encode('utf-8'))
         self.stream.read_until('\n', self.on_line)
 
     def on_line(self, data):
         try:
             data = data.rstrip()
-            print 'Got data', data
+            #print 'Got data', data
             msg = parse(data)
             if msg:
                 #print 'Msg:', msg
@@ -105,9 +106,30 @@ class RMonitorClient(object):
 
             self.stream.read_until('\n', self.on_line)
         except Exception as e:
-            print e
+            logging.exception(e)
             self.stream.close()
 
+class RMonitorFile(object):
+    def __init__(self, filename, callback=None):
+        self.callback = callback
+        self.f = open(filename, 'r')
+        tornado.ioloop.IOLoop.current().add_callback(self.on_file)
+
+    def on_file(self):
+        try:
+            data = self.f.readline().rstrip()
+            #print 'Got data', data
+            msg = parse(data)
+            if msg:
+                #print 'Msg:', msg
+                if self.callback:
+                    self.callback(msg)
+
+            tornado.ioloop.IOLoop.current().call_later(0.1, self.on_file)
+        except Exception as e:
+            logging.exception(e)
+        
+        
 
 if __name__ == "__main__":
     import sys

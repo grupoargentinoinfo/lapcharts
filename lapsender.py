@@ -2,8 +2,10 @@
 
 from os import path as op
 import json
+import logging
 import datetime
 from tornado import web, ioloop, iostream
+import tornado.options
 from tornadio2 import SocketConnection, TornadioRouter, SocketServer
 import rmonitor
 
@@ -36,8 +38,8 @@ class Session(object):
                 self.name = msg.name
                 #TODO broadcast to client
                 racers = {regno: ' '.join((racer.firstName, racer.lastName)) for regno,racer in self.racers.iteritems()}
-                print 'Run', self.name, racers
-                LapsConnection.broadcast(self.get_data)
+                logging.debug('Run %s %s', self.name, racers)
+                LapsConnection.broadcast(self.get_data())
 
             elif isinstance(msg, rmonitor.Race):
                 if msg.lap < 1:
@@ -47,14 +49,17 @@ class Session(object):
                     self.laps[msg.lap] = msg.ts
                     self.last_lap = msg.lap
 
+                if not msg.lap in self.laps:
+                    return
+
                 if not msg.lap in self.comps[msg.regno]:
                     gap = (msg.ts - self.laps[msg.lap]).total_seconds()
                     self.comps[msg.regno][msg.lap] = gap
                     #TODO broadcast
-                    print (msg.regno, msg.lap, gap)
+                    logging.debug('%s', (msg.regno, msg.lap, gap))
                     LapsConnection.broadcast({'type': 'gap', 'data': (msg.regno, msg.lap, gap)})
         except Exception as e:
-            print e
+            logging.exception(e)
 
     def get_data(self):
         # data format
@@ -76,9 +81,10 @@ class IndexHandler(web.RequestHandler):
         self.render('lapsender.html')
 
 
-class SocketIOHandler(web.RequestHandler):
-    def get(self):
-        self.render('socket.io.js')
+class FileHandler(web.RequestHandler):
+    def get(self, opt=None):
+        print opt
+        self.render(self.request.uri[1:])
 
 
 class DataHandler(web.RequestHandler):
@@ -122,27 +128,31 @@ class RouterConnection(SocketConnection):
     def on_open(self, info):
         print 'Router', repr(info)
 
-# Create RaceMonitor client
-rm = rmonitor.RMonitorClient(165)
-session = Session(rm)
-
-# Create tornadio server
-MyRouter = TornadioRouter(RouterConnection)
-
-# Create socket application
-application = web.Application(
-    MyRouter.apply_routes([(r"/", IndexHandler),
-                           (r"/data.json", DataHandler),
-                           (r"/socket.io.js", SocketIOHandler)]),
-    flash_policy_port = 8843,
-    flash_policy_file = op.join(ROOT, 'flashpolicy.xml'),
-    socket_io_port = 8001,
-    verify_remote_ip = False
-)
-
 if __name__ == "__main__":
-    import logging
-    logging.getLogger().setLevel(logging.DEBUG)
+    tornado.options.define('appid', default='165', help='RMonitor AppID')
+    tornado.options.parse_command_line()
+
+    # Create RaceMonitor client
+    #rm = rmonitor.RMonitorClient(tornado.options.options.appid)
+    rm = rmonitor.RMonitorFile('race.log')
+    session = Session(rm)
+
+    # Create tornadio server
+    MyRouter = TornadioRouter(RouterConnection)
+
+    # Create socket application
+    application = web.Application(
+        MyRouter.apply_routes([(r"/", IndexHandler),
+                               (r"/data.json", DataHandler),
+                               (r"/.*js", FileHandler),
+                               (r"/.*css", FileHandler),
+                               (r"/.*gif", FileHandler),
+                              ]),
+        flash_policy_port = 8843,
+        flash_policy_file = op.join(ROOT, 'flashpolicy.xml'),
+        socket_io_port = 8001,
+        verify_remote_ip = False
+    )
 
     # Create and start tornadio server
     SocketServer(application)
