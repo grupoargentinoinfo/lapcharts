@@ -61,7 +61,7 @@ class Session(object):
                     return
 
                 if not msg.lap in self.comps[msg.regno]:
-                    gap = (msg.ts - self.laps[msg.lap]).total_seconds()
+                    gap = (self.laps[msg.lap] - msg.ts).total_seconds()
                     self.comps[msg.regno][msg.lap] = gap
                     #TODO broadcast
                     logging.debug('%s', (msg.regno, msg.lap, gap))
