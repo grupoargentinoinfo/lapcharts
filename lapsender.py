@@ -6,11 +6,19 @@ import logging
 import datetime
 from tornado import web, ioloop, iostream
 import tornado.options
+import tornadio2.persistent
 from tornadio2 import SocketConnection, TornadioRouter, SocketServer
 import rmonitor
 
 
 ROOT = op.normpath(op.dirname(__file__))
+
+# Monkeypatch TornadioWebSocketHandler
+def check_origin(self, origin):
+    return True
+
+tornadio2.persistent.TornadioWebSocketHandler.check_origin = check_origin
+
 
 class Session(object):
     def __init__(self, rmclient):
