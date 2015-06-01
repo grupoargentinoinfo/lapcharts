@@ -141,8 +141,8 @@ if __name__ == "__main__":
     tornado.options.parse_command_line()
 
     # Create RaceMonitor client
-    #rm = rmonitor.RMonitorClient(tornado.options.options.appid)
-    rm = rmonitor.RMonitorFile('race.log')
+    rm = rmonitor.RMonitorClient(tornado.options.options.appid)
+    #rm = rmonitor.RMonitorFile('race.log')
     session = Session(rm)
 
     # Create tornadio server
